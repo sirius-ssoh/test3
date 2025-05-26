@@ -21,6 +21,7 @@ invite_guard = {}
 
 @bot.event
 async def on_ready():
+    await bot.wait_until_ready()
     for guild in bot.guilds:
         try:
             await bot.tree.sync(guild=guild)

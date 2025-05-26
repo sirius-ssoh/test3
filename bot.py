@@ -21,12 +21,12 @@ invite_guard = {}
 
 @bot.event
 async def on_ready():
-    for guild in bot.guilds:
-        try:
-            await bot.tree.sync(guild=guild)
-            print(f"✅ [{guild.name}] 슬래시 명령어 등록 완료!")
-        except Exception as e:
-            print(f"❌ [{guild.name}] 명령어 등록 실패: {e}")
+    try:
+        # 한 길드에서만 동기화 (GUILD_ID 사용)
+        await bot.tree.sync(guild=discord.Object(id=GUILD_ID))
+        print(f"✅ [Guild ID: {GUILD_ID}] 슬래시 명령어 등록 완료!")
+    except Exception as e:
+        print(f"❌ 슬래시 명령어 등록 실패: {e}")
 
     check_invite_guard.start()
     print(f"🤖 봇 온라인: {bot.user}")
@@ -37,6 +37,14 @@ async def on_ready():
     guild=discord.Object(id=GUILD_ID)
 )
 async def invite_command(interaction: discord.Interaction):
+    # #가입신청 채널에서만 사용 가능하도록 제한
+    if interaction.channel.name != "가입신청":
+        await interaction.response.send_message(
+            "❌ 이 명령어는 #가입신청 채널에서만 사용할 수 있습니다.",
+            ephemeral=True
+        )
+        return
+
     invite = await interaction.channel.create_invite(
         max_age=INVITE_EXPIRY_HOURS * 3600,
         max_uses=1,

@@ -95,5 +95,4 @@ async def check_invite_guard():
                     print(f"추방 실패: {member} - {e}")
                 invite_guard.remove(user_id)
 
-if name == "main":
-    bot.run(TOKEN)
+bot.run(TOKEN)

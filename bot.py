@@ -10,14 +10,14 @@ GUILD_ID = int(os.environ.get("GUILD_ID"))
 LOG_CHANNEL_NAME = "관리자-로그"
 INVITE_EXPIRY_HOURS = 24
 
-intents = discord.Intents.default()
-intents.members = True
-intents.guilds = True
 
-bot = commands.Bot(command_prefix="!", intents=intents)
-tree = bot.tree
+
+intents = discord.Intents.all()
+bot = discord.Client(intents=intents)
+tree = app_commands.CommandTree(bot)
 
 invite_guard = {}
+
 
 @bot.event
 async def on_ready():
@@ -31,11 +31,14 @@ async def on_ready():
     check_invite_guard.start()
     print(f"🤖 봇 온라인: {bot.user}")
 
+    await tree.sync
+
 @tree.command(
     name="초대",
     description="24시간 동안 유효한 1회용 임시 초대링크를 생성합니다.",
     guild=discord.Object(id=GUILD_ID)
 )
+@discord.app_commands.guild_only()
 async def invite_command(interaction: discord.Interaction):
     # #가입신청 채널에서만 사용 가능하도록 제한
     if interaction.channel.name != "가입신청":
@@ -92,5 +95,5 @@ async def check_invite_guard():
                     print(f"추방 실패: {member} - {e}")
                 invite_guard.pop(user_id, None)
 
-if __name__ == "__main__":
+if name == "main":
     bot.run(TOKEN)

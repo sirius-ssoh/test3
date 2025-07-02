@@ -83,8 +83,6 @@ async def check_invite_guard():
     for guild in bot.guilds:
         for user_id, expire_at in list(invite_guard.items()):
             member = guild.get_member(user_id)
-            if member and len(member.roles) >= 2:
-                invite_guard.remove(user_id)
             if member and len(member.roles) <= 1 and now > expire_at:
                 try:
                     await member.kick(reason="24시간 내 역할 미부여로 자동 추방")
@@ -93,6 +91,7 @@ async def check_invite_guard():
                         await log_channel.send(f"⛔️ {member.mention}님이 24시간 내 역할 미부여로 추방되었습니다.")
                 except Exception as e:
                     print(f"추방 실패: {member} - {e}")
-                invite_guard.remove(user_id)
+                invite_guard.pop(user_id, None)
 
-bot.run(TOKEN)
+if __name__ == "__main__":
+    bot.run(TOKEN)

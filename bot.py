@@ -76,6 +76,14 @@ async def on_member_update(before, after):
         if log_channel:
             await log_channel.send(f"✅ {after.mention}님에게 역할이 부여되어 추방 감시 해제되었습니다.")
 
+@bot.event
+async def on_member_remove(member):
+    if member.id in invite_guard:
+        invite_guard.pop(member.id, None)
+        log_channel = discord.utils.get(member.guild.text_channels, name=LOG_CHANNEL_NAME)
+        if log_channel:
+            await log_channel.send(f"🚪 {member.mention}님이 24시간 내에 서버를 나가 자동으로 감시가 해제되었습니다.")
+
 @tasks.loop(minutes=10)
 async def check_invite_guard():
     await bot.wait_until_ready()
